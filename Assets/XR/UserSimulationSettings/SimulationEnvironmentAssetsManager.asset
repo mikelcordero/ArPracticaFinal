@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SimulationEnvironmentAssetsManager
   m_EditorClassIdentifier: 
   m_EnvironmentPrefabPaths:
-  - Assets/MikelCorderoMedina/Prefab/DefaultSimulationEnvironment 1.prefab
+  - Assets/MikelCorderoMedina/Prefab/Prefabscene/DefaultSimulationEnvironment 1.prefab
   - Assets/MikelCorderoMedina/Prefab/Prefabscene/FactoryMikel.prefab
   - Assets/UnityXRContent/ARFoundation/SimulationEnvironments/Backyard/Backyard_45ftx40ft.prefab
   - Assets/UnityXRContent/ARFoundation/SimulationEnvironments/Backyard/Backyard_55ftx40ft.prefab
