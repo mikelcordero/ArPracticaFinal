@@ -41,9 +41,12 @@ public class ArrowPathManager : MonoBehaviour
             Vector3.forward,
             Vector3.forward,
             Vector3.forward,
+            Vector3.forward,
             Vector3.left,
             Vector3.left,
-            Vector3.left
+            Vector3.left,
+            Vector3.forward,
+            Vector3.left,
         };
 
         foreach (Vector3 dir in directions)
