@@ -1,23 +1,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class ArrowPathManager : MonoBehaviour
 {
+    [Header("Flechas")]
     [Tooltip("Prefab de la flecha")]
     public GameObject arrowPrefab;
-    [Tooltip("Distancia a la flecha para activar la siguiente")]
-    public float activationDistance = 1.2f;
     [Tooltip("Separación en metros entre flechas")]
     public float spacing = 2.5f;
+    [Tooltip("Distancia a la flecha para activarla (y reproducir el sonido)")]
+    public float activationDistance = 1.2f;
 
+    [Header("Audio")]
+    [Tooltip("Sonido que se reproduce al pasar cada flecha")]
+    public AudioClip passSound;
+
+    private AudioSource audioSource;
     private List<Vector3> pathPoints = new List<Vector3>();
     private int currentIndex = 0;
     private GameObject currentArrow;
     private bool pathInitialized = false;
 
-    /// <summary>
-    /// Llamar una vez, cuando la imagen pase a Tracking y sea visible.
-    /// </summary>
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
+    /// Llamar una sola vez cuando la imagen pase a Tracking y sea visible.
     public void InitializePath(Vector3 imagePosition)
     {
         if (pathInitialized) return;
@@ -26,7 +36,6 @@ public class ArrowPathManager : MonoBehaviour
         float groundY = 0.01f;
         Vector3 current = new Vector3(imagePosition.x, groundY, imagePosition.z);
 
-        // Avanzar 3 pasos, luego girar a la izquierda 3 pasos
         Vector3[] directions = new Vector3[]
         {
             Vector3.forward,
@@ -53,9 +62,13 @@ public class ArrowPathManager : MonoBehaviour
         float dist = Vector3.Distance(Camera.main.transform.position, currentArrow.transform.position);
         if (dist < activationDistance)
         {
+            if (passSound != null)
+                audioSource.PlayOneShot(passSound);
+
             Destroy(currentArrow);
             currentArrow = null;
             currentIndex++;
+
             CreateNextArrow();
         }
     }
@@ -71,7 +84,7 @@ public class ArrowPathManager : MonoBehaviour
         Vector3 to = pathPoints[currentIndex];
         Vector3 dir = (to - from).normalized;
 
-        // Apunta en dir + rotación extra -90° para corregir el prefab
+        // Rotación corregida -90° para que tu prefab apunte bien
         currentArrow = Instantiate(
             arrowPrefab,
             to,
