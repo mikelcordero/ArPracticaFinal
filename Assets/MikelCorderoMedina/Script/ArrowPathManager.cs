@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class ArrowPathManager : MonoBehaviour
 {
+    [Tooltip("Prefab de la flecha")]
     public GameObject arrowPrefab;
+    [Tooltip("Distancia a la flecha para activar la siguiente")]
     public float activationDistance = 1.2f;
+    [Tooltip("Separación en metros entre flechas")]
     public float spacing = 2.5f;
 
     private List<Vector3> pathPoints = new List<Vector3>();
@@ -12,24 +15,26 @@ public class ArrowPathManager : MonoBehaviour
     private GameObject currentArrow;
     private bool pathInitialized = false;
 
+    /// <summary>
+    /// Llamar una vez, cuando la imagen pase a Tracking y sea visible.
+    /// </summary>
     public void InitializePath(Vector3 imagePosition)
     {
         if (pathInitialized) return;
         pathInitialized = true;
 
         float groundY = 0.01f;
-        Vector3 startPos = new Vector3(imagePosition.x, groundY, imagePosition.z);
-        Vector3 current = startPos;
+        Vector3 current = new Vector3(imagePosition.x, groundY, imagePosition.z);
 
-        // 🔁 Camino lógico: avanzar 3 veces, luego girar a la izquierda 3 veces
+        // Avanzar 3 pasos, luego girar a la izquierda 3 pasos
         Vector3[] directions = new Vector3[]
         {
-            Vector3.forward,  // paso 1
-            Vector3.forward,  // paso 2
-            Vector3.forward,  // paso 3
-            Vector3.left,     // paso 4
-            Vector3.left,     // paso 5
-            Vector3.left      // paso 6
+            Vector3.forward,
+            Vector3.forward,
+            Vector3.forward,
+            Vector3.left,
+            Vector3.left,
+            Vector3.left
         };
 
         foreach (Vector3 dir in directions)
@@ -45,8 +50,8 @@ public class ArrowPathManager : MonoBehaviour
     {
         if (!pathInitialized || currentArrow == null) return;
 
-        float distance = Vector3.Distance(Camera.main.transform.position, currentArrow.transform.position);
-        if (distance < activationDistance)
+        float dist = Vector3.Distance(Camera.main.transform.position, currentArrow.transform.position);
+        if (dist < activationDistance)
         {
             Destroy(currentArrow);
             currentArrow = null;
@@ -59,14 +64,18 @@ public class ArrowPathManager : MonoBehaviour
     {
         if (currentIndex >= pathPoints.Count) return;
 
-        Vector3 from = currentIndex == 0
-            ? pathPoints[0] - Vector3.forward * spacing // punto anterior ficticio
+        Vector3 from = (currentIndex == 0)
+            ? pathPoints[0] - Vector3.forward * spacing
             : pathPoints[currentIndex - 1];
 
         Vector3 to = pathPoints[currentIndex];
         Vector3 dir = (to - from).normalized;
 
-        // 🔁 Instanciar la flecha mirando a la dirección + corrección de -90º para que apunte visualmente bien
-        currentArrow = Instantiate(arrowPrefab, to, Quaternion.LookRotation(dir) * Quaternion.Euler(0, -90, 0));
+        // Apunta en dir + rotación extra -90° para corregir el prefab
+        currentArrow = Instantiate(
+            arrowPrefab,
+            to,
+            Quaternion.LookRotation(dir) * Quaternion.Euler(0, -90, 0)
+        );
     }
 }
